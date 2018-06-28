@@ -1,35 +1,70 @@
-#![deny(missing_docs,
-        missing_debug_implementations, missing_copy_implementations,
-        trivial_casts, trivial_numeric_casts,
-        unsafe_code,
-        unstable_features,
-        unused_import_braces, unused_qualifications)]
-
+//#![deny(missing_docs,
+//        missing_debug_implementations, missing_copy_implementations,
+//        trivial_casts, trivial_numeric_casts,
+//        unsafe_code,
+//        unstable_features,
+//        unused_import_braces, unused_qualifications)]
+//
 use std::path::PathBuf;
 use std::path::Path;
 
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 
-/// the struct that contains which items are to be displayed
+/// The struct that contains which items are to be displayed
+/// - true for display of the given item
+/// - false if the given is not to be displayed
+/// - The default path for the configuration file is `/etc/ronky/ronky.conf`
 pub struct Config {
-  battery: bool,
-  cpu: bool, 
-  cpu_temperature: bool,
-  gpu: bool,
-  gpu_temperature: bool,
-  ram: bool,
-  ram_temperature: bool,
-  date: bool,
-  time: bool,
-  volume: bool,
-  hard_drive_usage: bool,
-  config_file: bool,
-  config_file_path: Option<PathBuf>,
+  pub battery: bool,
+  pub cpu: bool, 
+  pub cpu_temperature: bool,
+  pub gpu: bool,
+  pub gpu_temperature: bool,
+  pub ram: bool,
+  pub ram_temperature: bool,
+  pub date: bool,
+  pub time: bool,
+  pub volume: bool,
+  pub hard_drive_usage: bool,
+  pub config_file: bool,
+  pub config_file_path: Option<PathBuf>,
 }
 
-impl Config {
+/// Creates a new Config
+/// Takes a vector of &String - the arguments passed to ronky
+/// 
+/// Outputs a Result - Ok(Config) or Err 
+/// Output Config has all values set to false by default(except for config_file_path, 
+/// set to /etc/ronky/ronky.conf)
+/// 
+/// # Examples
+///
+/// ```
+/// 
+/// use std::path::PathBuf;
+/// let test_output = ronky::Config { battery: true, cpu: false, cpu_temperature: false, gpu: false, 
+///     gpu_temperature: true, ram: false, 
+///     ram_temperature: false, date: true, time: false, volume: false, hard_drive_usage: false, 
+///     config_file: false, config_file_path: Some(PathBuf::from("/etc/ronky/ronky.conf")) };
+///
+/// let test_config: &Vec<String> = &vec!["some_stuff_whatever".to_string(), 
+/// "--battery".to_string(), "--gpu_temperature".to_string(), "--date".to_string() ];
+///
+/// assert_eq!( ronky::Config::new(&test_config), Ok(test_output) ) ;
+///
+/// ```
+///    
+/// # Errors
+///
+/// new() will return an Err if: 
+///  - The `--config` flag is given, but no file is passed as an argument
+///  - The config file doesn't exist or permissions render it inaccessible
+///  - An invalid flag is passed
 
+
+impl Config {
+         
   pub fn new(args: &[String]) -> Result<Config, &'static str> {
     let mut battery = false;
     let mut cpu = false;
@@ -43,7 +78,7 @@ impl Config {
     let mut volume = false;
     let mut hard_drive_usage = false; 
     let mut config_file = false;
-    let mut config_file_path: Option<PathBuf> = None;
+    let mut config_file_path: Option<PathBuf> = Some(PathBuf::from("/etc/ronky/ronky.conf"));
     
     // this is a counting bit to account for invalid flags
     // if a value is not a valid flag and next_is_config is
@@ -87,3 +122,4 @@ impl Config {
     Ok (Config { battery, cpu, cpu_temperature, gpu, gpu_temperature, ram, ram_temperature, date, time, volume, hard_drive_usage, config_file, config_file_path } )
   }
 }
+
