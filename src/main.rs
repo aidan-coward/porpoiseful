@@ -1,9 +1,9 @@
-extern crate ronky;
+extern crate porpoiseful;
 
 use std::env;
 use std::process;
 
-use ronky::Config;
+use porpoiseful::Config;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
