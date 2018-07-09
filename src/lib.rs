@@ -49,31 +49,31 @@ pub enum DisplayValue {
     CPULoadCore7,
 
     /// Average temperature of all the cpu cores
-    CPUTemperatureAverage,
+    CPUTempAverage,
 
     /// The temperature of the 0th core
-    CPUTemperatureCore0,
+    CPUTempCore0,
 
     /// The temperature of the 1st core
-    CPUTemperatureCore1,
+    CPUTempCore1,
 
     /// The temperature of the 2nd core
-    CPUTemperatureCore2,
+    CPUTempCore2,
 
     /// The temperature of the 3rd core
-    CPUTemperatureCore3,
+    CPUTempCore3,
 
     /// The temperature of the 4th core
-    CPUTemperatureCore4,
+    CPUTempCore4,
 
     /// The temperature of the 5th core
-    CPUTemperatureCore5,
+    CPUTempCore5,
 
     /// The temperature of the 6th core
-    CPUTemperatureCore6,
+    CPUTempCore6,
 
     /// The temperature of the 7th core
-    CPUTemperatureCore7,
+    CPUTempCore7,
 
     /// The load of the 1st GPU in percentage
     GPULoad0,
@@ -82,10 +82,10 @@ pub enum DisplayValue {
     GPULoad1,
 
     /// The temperature of the 0th GPU
-    GPUTemperature1,
+    GPUTemp1,
 
     /// The temperature of the 1st GPU
-    GPUTemperature2,
+    GPUTemp2,
 
     /// Usage of RAM
     RAMUsage,
@@ -141,7 +141,7 @@ pub struct Config {
     pub file_path: Option<PathBuf>,
 
     /// The arguments passed with the Config
-    pub args: Option<Vec<String>>,
+    pub arguments : Option<Vec<String>>,
 }
 
 lazy_static! {
@@ -151,6 +151,7 @@ lazy_static! {
     static ref FLAG_LIST: Vec<&'static str> =
         vec![
             "--battery",
+            "--config",
             "--cpu-temp",
             "--cpu-load",
             "--gpu-load",
@@ -322,7 +323,7 @@ impl Config {
 /// let test_args: Vec<String> = vec!["--battery".to_string()];
 ///
 /// let test_output: Result<Config, String> = 
-///     Ok( Config { display_value: porpoiseful::DisplayValue::BatteryLifePercentage, command_path: None, config_path: None, file_path: Some(PathBuf::from("/sys/class/power_supply/BAT0/capacity")), args: None });
+///     Ok( Config { display_value: porpoiseful::DisplayValue::BatteryLifePercentage, command_path: None, config_path: None, file_path: Some(PathBuf::from("/sys/class/power_supply/BAT0/capacity")), arguments: None });
 ///
 /// assert_eq!(Config::new(&test_args), test_output);
 ///
@@ -335,7 +336,7 @@ impl Config {
                      command_path: None,
                      config_path: None,
                      file_path: None,
-                     args: None };
+                     arguments: None };
     
         match args[0].as_ref() {
 
@@ -367,14 +368,14 @@ impl Config {
 ///                            command_path: None,
 ///                            config_path: None,
 ///                            file_path: None,
-///                            args: None };
+///                            arguments: None };
 ///
 /// let test_output = Ok(Config { display_value: DisplayValue::BatteryLifePercentage,
 ///                            command_path: None,
 ///                            config_path: None,
 ///                            file_path:
 ///                            Some(PathBuf::from("/sys/class/power_supply/BAT0/capacity")),
-///                            args: None });
+///                            arguments: None });
 ///
 /// assert_eq!(test_config.new_battery(&test_args), test_output);
 ///
@@ -405,14 +406,14 @@ impl Config {
 ///                            command_path: None,
 ///                            config_path: None,
 ///                            file_path: None,
-///                            args: None };
+///                            arguments: None };
 ///
 /// let test_output_ok = Ok(Config { display_value: DisplayValue::ConfigFile,
 ///                            command_path: None,
 ///                            config_path: 
 ///                            Some(PathBuf::from("/etc/porpoiseful/porpoiseful.conf")),
 ///                            file_path: None,
-///                            args: None });
+///                            arguments: None });
 ///
 ///
 /// assert_eq!(test_config.new_conf_file(&test_args_ok), test_output_ok);
@@ -421,7 +422,7 @@ impl Config {
 ///                            command_path: None,
 ///                            config_path: None,
 ///                            file_path: None,
-///                            args: None };
+///                            arguments: None };
 ///
 /// let test_args_err = vec!["--config".to_string(), "/root/porpoiseful.conf".to_string()];
 ///
@@ -448,6 +449,7 @@ impl Config {
             // If it is not valid, return Err
             2 => {
                 let given_config_path = PathBuf::from(args[1].clone());
+
                 if given_config_path.exists() {
                     self.config_path = Some(given_config_path);
                     return Ok(self);
@@ -457,14 +459,46 @@ impl Config {
             },
 
             // If there is only one argument given, return Ok and use the default configuration file
-            _ => {
+            1 => {
                 self.config_path = Some(PathBuf::from("/etc/porpoiseful/porpoiseful.conf"));
                 return Ok(self);
-                },
+                }
+
+            _ => { 
+                Err("Something went wrong while parsing --config".to_string())
+            },
         }
     }
 
+    pub fn new_cpu_temp(mut self, args: &[String]) -> Result<Config, String> {
+            
+        match args.len() {
+
+            // If is more than one arg passed with --config, return Err
+            d if d > 2 => Err("--cpu-temp takes a single argument".to_string()),
+
+            // If there are no args passed with --config, return Err
+            1 => Err("--cpu requires an argument".to_string()),
+
+            // If one arg is passed, add it to args of the output Config
+            2 => {
+                self.arguments = Some(vec![args[1].clone()]);
+                self.display_value = DisplayValue::CPUTempAverage;
+                Ok(self)
+            }
+            
+            _ => {
+                Err("something went wrong while parsing --cpu_temp".to_string()) 
+            },
+        }
     }
+}
+
+                
+
+
+
+
 
 
 
