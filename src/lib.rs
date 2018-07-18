@@ -307,11 +307,11 @@ impl Config {
 ///
 /// use porpoiseful::{Config};
 ///
-/// let test_args: Vec<String> = vec!["args".to_string()];
+/// let mut test_args: Vec<String> = vec!["args".to_string()];
 ///
 /// let test_output: Result<Config, String> = Err("not a valid configuration option".to_string());
 ///
-/// assert_eq!(Config::new(&test_args), test_output);
+/// assert_eq!(Config::new(&mut test_args), test_output);
 ///
 /// ```
 /// 
@@ -320,16 +320,16 @@ impl Config {
 /// use porpoiseful::{Config, DisplayValue};
 /// use std::path::PathBuf;
 ///
-/// let test_args: Vec<String> = vec!["--battery".to_string()];
+/// let mut test_args: Vec<String> = vec!["--battery".to_string()];
 ///
 /// let test_output: Result<Config, String> = 
 ///     Ok( Config { display_value: porpoiseful::DisplayValue::BatteryLifePercentage, command_path: None, config_path: None, file_path: Some(PathBuf::from("/sys/class/power_supply/BAT0/capacity")), arguments: None });
 ///
-/// assert_eq!(Config::new(&test_args), test_output);
+/// assert_eq!(Config::new(&mut test_args), test_output);
 ///
 /// ```
 
-    pub fn new(args: &[String]) -> Result<Config, String> {
+    pub fn new(args: &mut [String]) -> Result<Config, String> {
 
         let output_config: Config = 
             Config { display_value: DisplayValue::NoValue, 
