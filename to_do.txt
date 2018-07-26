@@ -1,0 +1,4 @@
+flag_list is collected from the 'flag' field of all the existing FlagOptions
+replace is_flag() with is_element fn of vectors
+
+replace all for x in 0..vec.len() with &vec and enumerate if necessary

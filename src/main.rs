@@ -1,5 +1,7 @@
 extern crate porpoiseful;
 
+pub mod flag_options;
+
 //use std::env;
 //use std::process;
 
